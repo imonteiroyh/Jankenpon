@@ -28,3 +28,4 @@ class Network():
         except socket.error as error:
             print('Erro ao enviar informações.')
             print(error)
+            
