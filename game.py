@@ -48,7 +48,6 @@ class Game:
             winner_player = 1
         elif player1 == 'S' and player2 == 'P':
             winner_player = 0
-        
         return winner_player
 
     def reset_went(self):
