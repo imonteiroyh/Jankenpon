@@ -52,6 +52,7 @@ def threaded_client(connection_socket, player, game_id):
             break
 
     print('Conexão perdida')    
+    
     try:
         del games[game_id]
         print('Encerrando jogo ', game_id)
