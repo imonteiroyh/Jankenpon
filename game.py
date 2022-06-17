@@ -48,7 +48,20 @@ class Game:
             winner_player = 1
         elif player1 == 'S' and player2 == 'P':
             winner_player = 0
+
         return winner_player
+
+    def update_match(self, player):
+        if player == -1:
+            self.ties += 1
+        else:
+            self.wins[player] += 1
+
+    def get_wins(self, player):
+        return int(self.wins[player]/2)
+    
+    def get_ties(self):
+        return int(self.ties/2)
 
     def reset_went(self):
         self.player1_went = False

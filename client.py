@@ -1,6 +1,7 @@
 import pygame
 from network import Network
 from game import Game
+import pdb
 
 WIDTH = 700
 HEIGHT = 700
@@ -84,6 +85,17 @@ def redraw_display_surface(display_surface, game, player):
 
         text = font.render('Oponente', True, RED)
         display_surface.blit(text, (515, 200))
+
+        text1 = font.render('Vitórias: ' + str(game.get_wins(0)), True, BLACK)
+        text2 = font.render('Vitórias: ' + str(game.get_wins(1)), True, BLACK)
+        text3 = font.render('Empates: ' + str(game.get_ties()), True, BLACK)
+        if player == 0:
+            display_surface.blit(text1, (75, 250))
+            display_surface.blit(text2, (515, 250))
+        else:
+            display_surface.blit(text2, (75, 250))
+            display_surface.blit(text1, (525, 250))
+        display_surface.blit(text3, (295, 250))
 
         player1_move = game.get_players_moves(0)
         player2_move = game.get_players_moves(1)
@@ -170,6 +182,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
+                #pdb.set_trace()
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_position = pygame.mouse.get_pos()
@@ -201,8 +214,9 @@ def menu_screen():
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
                 run = False
+                pygame.quit()
+                #pdb.set_trace()
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False

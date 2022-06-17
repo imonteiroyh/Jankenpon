@@ -41,6 +41,7 @@ def threaded_client(connection_socket, player, game_id):
                 else:
                     if data == 'reset_game':
                         game.reset_went()
+                        game.update_match(game.winner_player())
                     elif data != 'get_another_player':
                         game.player_played(player, data)
                     
@@ -52,7 +53,6 @@ def threaded_client(connection_socket, player, game_id):
             break
 
     print('Conexão perdida')    
-    
     try:
         del games[game_id]
         print('Encerrando jogo ', game_id)
