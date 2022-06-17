@@ -1,7 +1,6 @@
 import pygame
 from network import Network
 from game import Game
-import pdb
 
 WIDTH = 700
 HEIGHT = 700
@@ -182,7 +181,6 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
-                #pdb.set_trace()
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_position = pygame.mouse.get_pos()
@@ -216,7 +214,6 @@ def menu_screen():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
-                #pdb.set_trace()
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
