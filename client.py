@@ -6,15 +6,26 @@ WIDTH = 700
 HEIGHT = 700
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+RED = (202, 0, 42)
+GREEN = (0, 82, 33)
+BLUE = (6, 77, 135)
 
 pygame.init()
 pygame.font.init()
-pygame.display.set_caption('Dots and Boxes')
-window = pygame.display.set_mode((WIDTH, HEIGHT))
-font = pygame.font.SysFont('comicsans', 25)
+pygame.mixer.init()
+pygame.display.set_caption('Jankenpon')
+display_surface = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.mixer.music.load('Undertale - Asgore.mp3')
+rock_image = pygame.image.load('images/rock.png')
+paper_image = pygame.image.load('images/paper.png')
+scissors_image = pygame.image.load('images/scissors.png')
+background_image = pygame.image.load('images/background.png')
+
+rps_dictionary = {
+    "Rock" : "Pedra",
+    "Paper" : "Papel",
+    "Scissors" : "Tesoura"
+}
 
 class Button:
     def __init__(self, text, x, y, color):
@@ -22,13 +33,14 @@ class Button:
         self.x = x
         self.y = y
         self.color = color
-        self.width = 150
-        self.height = 150
+        self.width = 162
+        self.height = 162
 
-    def draw_button(self, window):
-        pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
+    def draw_button(self, display_surface):
+        pygame.draw.rect(display_surface, self.color, (self.x, self.y, self.width, self.height))
+        font = pygame.font.SysFont('timesnewroman', 30)
         text = font.render(self.text, True, WHITE)
-        window.blit(text, (self.x + round((self.width - text.get_width())/2), (self.y + round(self.height - text.get_height())/2)))
+        display_surface.blit(text, (self.x + round((self.width - text.get_width())/2), (self.y + round(self.height - text.get_height())/2)))
 
     def button_clicked(self, mouse_position):
         mouse_position_x = mouse_position[0]
@@ -39,56 +51,80 @@ class Button:
         else:
             return False
 
-def redraw_window(window, game, player):
-    window.fill(WHITE)
+def write_music_copyright():
+    font = pygame.font.SysFont('timesnewroman', 27)
+    music_copyright = font.render('Tema de Asgore Dreemmur por Toby Fox', True, BLACK)
+    music_cover = font.render('Cover acústico por Lenich & Kirya', True, BLACK)
+    display_surface.blit(music_copyright, ((WIDTH - (music_copyright.get_width() + 20)), (HEIGHT - (music_cover.get_height() + 20) - music_copyright.get_height())))
+    display_surface.blit(music_cover, ((WIDTH - (music_cover.get_width() + 20)), (HEIGHT - (music_cover.get_height() + 20))))
+
+def write_title():
+    font = pygame.font.SysFont('timesnewroman', 77)
+    title = font.render('Jankenpon', True, BLACK)
+    display_surface.blit(title, ((WIDTH - title.get_width())/2, 30))
+
+def load_images():
+    display_surface.blit(rock_image, (75, 450))
+    display_surface.blit(paper_image, (275, 450))
+    display_surface.blit(scissors_image, (475, 450))
+
+def redraw_display_surface(display_surface, game, player):
+    display_surface.fill(WHITE)
+    write_title()
+    write_music_copyright()
+    font = pygame.font.SysFont('timesnewroman', 30)
 
     if not game.connected():
-        text = font.render('Esperando outro jogador', True, BLUE, True)
-        window.blit(text, ((WIDTH - text.get_width())/2, (HEIGHT - text.get_height())/2))
+        font = pygame.font.SysFont('timesnewroman', 50)
+        text = font.render('Esperando outro jogador...', True, BLACK)
+        display_surface.blit(text, ((WIDTH - text.get_width())/2, (HEIGHT - text.get_height())/2))
     else:
-        text = font.render('Sua jogada', True, RED)
-        window.blit(text, (80, 200))
+        text = font.render('Jogador', True, RED)
+        display_surface.blit(text, (75, 200))
 
         text = font.render('Oponente', True, RED)
-        window.blit(text, (380, 200))
+        display_surface.blit(text, (515, 200))
 
         player1_move = game.get_players_moves(0)
         player2_move = game.get_players_moves(1)
 
+        font = pygame.font.SysFont('timesnewroman', 30)
         if game.both_players_went():
-            left_text = font.render(player1_move, 1, BLACK)
-            right_text = font.render(player2_move, 2, BLACK)
+            text1 = font.render(rps_dictionary[player1_move], 1, BLACK)
+            text2 = font.render(rps_dictionary[player2_move], 2, BLACK)
         else:
             if player == 0 and game.player1_went == True:
-                left_text = font.render(player1_move, 1, BLACK)
+                text1 = font.render(rps_dictionary[player1_move], 1, BLACK)
             elif game.player1_went == True:
-                left_text = font.render('Movimento escolhido', 1, BLACK)
+                text1 = font.render('Escolheu!', 1, BLACK)
             else:
-                left_text = font.render('Esperando', 1, BLACK)
+                text1 = font.render('Escolhendo...', 1, BLACK)
 
             if player == 1 and game.player2_went == True:
-                right_text = font.render(player2_move, 1, BLACK)
+                text2 = font.render(rps_dictionary[player2_move], 1, BLACK)
             elif game.player2_went == True:
-                right_text = font.render('Movimento escolhido', 1, BLACK)
+                text2 = font.render('Escolheu!', 1, BLACK)
             else:
-                right_text = font.render('Esperando', 1, BLACK)
+                text2 = font.render('Escolhendo...', 1, BLACK)
             
             if player == 0:
-                window.blit(left_text, (100, 350))
-                window.blit(right_text, (400, 350))
+                display_surface.blit(text1, (85, 350))
+                display_surface.blit(text2, (475, 350))
             else:
-                window.blit(right_text, (100, 350))
-                window.blit(right_text, (400, 350))
+                display_surface.blit(text2, (85, 350))
+                display_surface.blit(text1, (475, 350))
 
             for button in buttons:
-                button.draw_button(window)
+                button.draw_button(display_surface)
+                
+            load_images()
 
     pygame.display.update()
 
 buttons = [
-    Button('Rock', 50, 500, RED), 
-    Button('Paper', 250, 500, BLUE),
-    Button('Scissors', 450, 500, GREEN)
+    Button('Rock', 75, 450, RED), 
+    Button('Paper', 275, 450, BLUE),
+    Button('Scissors', 475, 450, GREEN)
 ]
 
 def main():
@@ -109,7 +145,7 @@ def main():
             break
 
         if game.both_players_went():
-            redraw_window(window, game, player)
+            redraw_display_surface(display_surface, game, player)
             pygame.time.delay(500)
             try:
                 game = network.send('reset_game')
@@ -118,14 +154,15 @@ def main():
                 print('Não foi possível conseguir um jogo')
                 break
                 
-            if (game.winner_player == 0 and player == 0) or (game.winner_player == 1 and player == 1):
-                text = font.render('Você venceu', True, GREEN)
-            elif game.winner_player == -1:
+            font = pygame.font.SysFont('timesnewroman', 50)
+            if (game.winner_player() == 0 and player == 0) or (game.winner_player() == 1 and player == 1):
+                text = font.render('Você venceu!', True, GREEN)
+            elif game.winner_player() == -1:
                 text = font.render('Empate', True, BLUE)
             else:
-                text = font.render('Você perdeu', True, RED)
+                text = font.render('Você perdeu...', True, RED)
 
-            window.blit(text, ((WIDTH - text.get_width())/2, (HEIGHT - text.get_height())/2))
+            display_surface.blit(text, ((WIDTH - text.get_width())/2, (HEIGHT - text.get_height())/2))
             pygame.display.update()
             pygame.time.delay(2000)
 
@@ -146,17 +183,20 @@ def main():
                             if not game.player2_went:
                                 network.send(button.text)
         
-        redraw_window(window, game, player)
-"""
+        redraw_display_surface(display_surface, game, player)
+
 def menu_screen():
     run = True
     clock = pygame.time.Clock()
 
     while run:
         clock.tick(70)
-        window.fill(BLACK)
-        text = font.render('Clique para jogar', True, BLUE)
-        window.blit(text, (100, 200))
+        display_surface.fill(WHITE)
+        write_title()
+        write_music_copyright()
+        font = pygame.font.SysFont('timesnewroman', 80)
+        text = font.render('Clique para Jogar!', True, BLACK)
+        display_surface.blit(text, ((WIDTH - text.get_width())/2, (HEIGHT - text.get_height())/2))
         pygame.display.update()
     
         for event in pygame.event.get():
@@ -170,6 +210,5 @@ def menu_screen():
     main()
 
 while True:
+    pygame.mixer.music.play(-1)
     menu_screen()
-"""
-main()
